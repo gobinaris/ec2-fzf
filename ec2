@@ -1,9 +1,8 @@
-#!/bin/bash -e
-
+#!/bin/bash
+set -eu
 
 BUCKET=ec2-cache.binaris.com
-DEFAULT_FZF_QUERY=${1:-$realm}
-DEFAULT_FZF_QUERY=${DEFAULT_FZF_QUERY:-$USER}
+DEFAULT_FZF_QUERY=${1:-${realm:-$USER}}
 
 # Requirements:
 # - fzf

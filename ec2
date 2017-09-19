@@ -14,7 +14,8 @@ function get_cache() {
 }
 
 cache=$(get_cache)
-export chosen=$(echo "$cache" | fzf -q "$DEFAULT_FZF_QUERY")
+chosen=$(echo "$cache" | fzf -q "$DEFAULT_FZF_QUERY")
+export chosen
 
 function lookup() {
     chosen=$1

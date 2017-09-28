@@ -14,12 +14,12 @@ function get_cache() {
 }
 
 function choose() {
-    export cache="$(get_cache)"
-    echo -e "$cache\n%refresh ec2 cache" | fzf -q "$DEFAULT_FZF_QUERY"
+    cache="$(get_cache)"
+    chosen=$(echo -e "$cache\n%refresh ec2 cache" | fzf -q "$DEFAULT_FZF_QUERY")
 }
 
 while true; do
-    export chosen=$(choose)
+    choose
     if [[ -z "$chosen" ]]; then
         exit 1
     elif [[ "$chosen" == "%refresh ec2 cache" ]]; then

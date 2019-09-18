@@ -1,0 +1,44 @@
+#!/bin/bash
+set -eu
+
+BUCKET=ec2-cache.binaris.com
+DEFAULT_FZF_QUERY=${1:-${realm:-$USER}}
+
+# Requirements:
+# - fzf
+# - aws cli
+
+function get_cache() {
+    # Set you bucket name here
+    aws s3 cp --quiet s3://$BUCKET/instances.fzf >(cat)
+}
+
+function choose() {
+    cache="$(get_cache)"
+    chosen=$(echo -e "$cache\n%refresh ec2 cache" | fzf -q "$DEFAULT_FZF_QUERY")
+}
+
+while true; do
+    choose
+    if [[ -z "$chosen" ]]; then
+        exit 1
+    elif [[ "$chosen" == "%refresh ec2 cache" ]]; then
+        echo "Refreshing EC2 fuzzy cache..."
+        aws lambda invoke --region ${region:-eu-central-1} --function-name ec2-fzf-${region:-eu-central-1}-discover_instances /dev/null >/dev/null
+    else
+        break
+    fi
+done
+
+function lookup() {
+    chosen=$1
+    field=$2
+    echo $chosen | grep -o -E "$field:\\S+" | cut -d ':' -f2
+}
+
+export key=$(lookup "$chosen" key)
+export pub_ip=$(lookup "$chosen" pub_ip)
+export priv_ip=$(lookup "$chosen" priv_ip)
+export realm=$(lookup "$chosen" realm)
+
+echo $pub_ip

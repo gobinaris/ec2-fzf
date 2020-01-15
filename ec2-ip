@@ -18,17 +18,14 @@ function choose() {
     chosen=$(echo -e "$cache\n%refresh ec2 cache" | fzf -q "$DEFAULT_FZF_QUERY")
 }
 
-while true; do
+until
     choose
-    if [[ -z "$chosen" ]]; then
-        exit 1
-    elif [[ "$chosen" == "%refresh ec2 cache" ]]; then
-        echo "Refreshing EC2 fuzzy cache..."
-        aws lambda invoke --region ${region:-eu-central-1} --function-name ec2-fzf-${region:-eu-central-1}-discover_instances /dev/null >/dev/null
-    else
-        break
-    fi
+    [[ "$chosen" != "%refresh ec2 cache" ]];
+do
+    echo "Refreshing EC2 fuzzy cache..."
+    aws lambda invoke --region ${region:-eu-central-1} --function-name ec2-fzf-${region:-eu-central-1}-discover_instances /dev/null >/dev/null
 done
+if [[ -z "$chosen" ]]; then exit 1; fi
 
 function lookup() {
     chosen=$1

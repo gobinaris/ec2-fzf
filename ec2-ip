@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eu
 
+# TODO: deduplicate code between ec2 and ec2-ip, allow running a command
+
 BUCKET=ec2-cache.binaris.com
 DEFAULT_FZF_QUERY=${1:-${realm:-$USER}}
 
